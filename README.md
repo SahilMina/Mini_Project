@@ -4,7 +4,7 @@
 **Guide:** Prof. Srikantaiah K C, Department of Computer Science  
 **Institution:** Central University of Karnataka, Kadaganchi, Kalaburagi – 585367, INDIA  
 **Degree / Phase:** Mini Project Semester 5 (Phase II Architecture)  
-**Status:** 100% Local On-Device Boundary | 26 Automated Test Suites Passing (100% Green)
+**Status:** 100% Local On-Device Boundary 
 
 ---
 
