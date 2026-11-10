@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clinical Counselor & Admin Triage Portal | Central University of Karnataka</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/app.css?v=20261110_admin_v1">
+    <style>
+        :root {
+            --bg-counselor: #0b0f17;
+            --card-counselor: rgba(18, 24, 38, 0.9);
+            --border-counselor: rgba(255, 255, 255, 0.1);
+            --rose-alert: #f43f5e;
+            --rose-glow: rgba(244, 63, 94, 0.25);
+            --emerald-glow: rgba(16, 185, 129, 0.25);
+        }
+
+        body {
+            background-color: var(--bg-counselor);
+            background-image: radial-gradient(circle at 10% 20%, rgba(244, 63, 94, 0.06) 0%, transparent 40%),
+                              radial-gradient(circle at 90% 80%, rgba(56, 189, 248, 0.05) 0%, transparent 40%);
+            color: #f3f4f6;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        .admin-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 2rem;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-counselor);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .admin-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+        }
+
+        .admin-logo {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #f43f5e, #be123c);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 800;
+            font-size: 1.1rem;
+            box-shadow: 0 0 15px var(--rose-glow);
+        }
+
+        .admin-title-wrap h1 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin: 0;
+            color: #fff;
+        }
+
+        .admin-title-wrap p {
+            font-size: 0.72rem;
+            color: #94a3b8;
+            margin: 0;
+        }
+
+        .admin-user-pill {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-counselor);
+            padding: 0.4rem 0.85rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+        }
+
+        .role-tag {
+            background: rgba(244, 63, 94, 0.2);
+            border: 1px solid rgba(244, 63, 94, 0.4);
+            color: #fda4af;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        .btn-admin-logout {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #cbd5e1;
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-admin-logout:hover {
+            background: rgba(244, 63, 94, 0.15);
+            border-color: #f43f5e;
+            color: #fff;
+        }
+
+        /* Container & Grid */
+        .admin-main {
+            max-width: 1280px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .admin-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card-counselor);
+            border: 1px solid var(--border-counselor);
+            border-radius: 12px;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .stat-card.alert {
+            border-left: 4px solid var(--rose-alert);
+        }
+
+        .stat-card.active-users {
+            border-left: 4px solid #10b981;
+        }
+
+        .stat-card.telemetry {
+            border-left: 4px solid #38bdf8;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #94a3b8;
+            letter-spacing: 0.04em;
+        }
+
+        .stat-val {
+            font-size: 1.85rem;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+            color: #fff;
+        }
+
+        .stat-sub {
+            font-size: 0.72rem;
+            color: #64748b;
+        }
+
+        /* Crisis Triage Table */
+        .triage-section {
+            background: var(--card-counselor);
+            border: 1px solid var(--border-counselor);
+            border-radius: 14px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .triage-section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 1rem;
+        }
+
+        .triage-title-group h2 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin: 0;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .triage-title-group p {
+            font-size: 0.78rem;
+            color: #94a3b8;
+            margin: 0.25rem 0 0;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .triage-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            text-align: left;
+        }
+
+        .triage-table th {
+            padding: 0.85rem 1rem;
+            background: rgba(0, 0, 0, 0.25);
+            color: #94a3b8;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 700;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .triage-table td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            vertical-align: middle;
+        }
+
+        .triage-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .case-pill {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.78rem;
+            color: #38bdf8;
+            background: rgba(56, 189, 248, 0.1);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .tier-badge-high {
+            background: rgba(244, 63, 94, 0.18);
+            border: 1px solid rgba(244, 63, 94, 0.4);
+            color: #fda4af;
+            padding: 0.2rem 0.6rem;
+            border-radius: 9999px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .tremor-meter {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+        }
+
+        .tremor-bar-track {
+            width: 60px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .tremor-bar-fill {
+            height: 100%;
+            background: #f43f5e;
+            border-radius: 3px;
+        }
+
+        .btn-decrypt-case {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            color: #34d399;
+            padding: 0.45rem 0.85rem;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .btn-decrypt-case:hover {
+            background: rgba(16, 185, 129, 0.3);
+            transform: translateY(-1px);
+        }
+
+        /* Modal Dual-Key Decryption */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal-card {
+            background: #111827;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 620px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+            overflow: hidden;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        .modal-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.05rem;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-close-modal {
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            font-size: 1.25rem;
+            cursor: pointer;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .privacy-box {
+            background: rgba(56, 189, 248, 0.08);
+            border-left: 3px solid #38bdf8;
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            color: #bae6fd;
+            margin-bottom: 1.25rem;
+            line-height: 1.4;
+        }
+
+        .decrypted-text-view {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 1rem;
+            font-size: 0.88rem;
+            color: #f1f5f9;
+            margin-top: 1rem;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            display: none;
+        }
+
+        /* Auth Screen (When not logged in as Admin) */
+        .admin-login-wrap {
+            max-width: 440px;
+            margin: 5rem auto;
+            background: var(--card-counselor);
+            border: 1px solid var(--border-counselor);
+            border-radius: 16px;
+            padding: 2.25rem;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TOPBAR -->
+    <header class="admin-topbar">
+        <div class="admin-brand">
+            <div class="admin-logo">Ψ</div>
+            <div class="admin-title-wrap">
+                <h1>Clinical Counseling & Triage Portal</h1>
+                <p>Central University of Karnataka • University Health Centre</p>
+            </div>
+        </div>
+
+        <div id="admin-user-header" style="display: none; align-items: center; gap: 1rem;">
+            <div class="admin-user-pill">
+                <span id="admin-user-name">Prof. Srikantaiah K C</span>
+                <span class="role-tag" id="admin-user-role">COUNSELOR</span>
+            </div>
+            <button class="btn-admin-logout" onclick="handleAdminLogout()">Log Out</button>
+        </div>
+    </header>
+
+    <!-- 1. ADMIN LOGIN VIEW (Displayed if unauthenticated) -->
+    <div id="admin-login-view" class="admin-login-wrap">
+        <div style="text-align: center; margin-bottom: 1.5rem;">
+            <div style="display: inline-block; padding: 0.4rem 0.8rem; background: rgba(244, 63, 94, 0.12); border: 1px solid rgba(244, 63, 94, 0.3); border-radius: 9999px; color: #fda4af; font-size: 0.72rem; font-weight: 700; text-transform: uppercase;">
+                Authorized Staff Access Only
+            </div>
+            <h2 style="font-size: 1.3rem; margin: 0.65rem 0 0.25rem;">Staff & Counselor Sign In</h2>
+            <p style="font-size: 0.8rem; color: #94a3b8; margin: 0;">Access priority student crisis referrals & handoffs</p>
+        </div>
+
+        <div id="login-error-alert" style="display: none; background: rgba(244, 63, 94, 0.15); border: 1px solid rgba(244, 63, 94, 0.4); color: #fda4af; padding: 0.65rem; border-radius: 6px; font-size: 0.8rem; margin-bottom: 1rem;"></div>
+
+        <form id="admin-login-form" onsubmit="handleAdminLoginSubmit(event)">
+            <div class="form-group" style="margin-bottom: 1.1rem;">
+                <label class="form-label" style="font-size: 0.8rem; font-weight: 600; color: #d1d5db; display: block; margin-bottom: 0.35rem;">Staff Role</label>
+                <select id="admin-role-select" class="form-input" style="width: 100%; padding: 0.75rem; background: rgba(15,23,42,0.8); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #fff;">
+                    <option value="counselor">Campus Clinical Counselor (Health Centre)</option>
+                    <option value="hod">HOD / Department Faculty Advisor</option>
+                    <option value="admin">Chief Medical Officer / System Administrator</option>
+                </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 1.1rem;">
+                <label class="form-label" style="font-size: 0.8rem; font-weight: 600; color: #d1d5db; display: block; margin-bottom: 0.35rem;">Employee ID or University Email</label>
+                <input type="text" id="admin-identifier" class="form-input" style="width: 100%; padding: 0.75rem; background: rgba(15,23,42,0.8); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #fff; box-sizing: border-box;" placeholder="e.g. COUNSELOR-001 or faculty@cuk.ac.in" required>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 1.25rem;">
+                <label class="form-label" style="font-size: 0.8rem; font-weight: 600; color: #d1d5db; display: block; margin-bottom: 0.35rem;">Security Passphrase</label>
+                <input type="password" id="admin-password" class="form-input" style="width: 100%; padding: 0.75rem; background: rgba(15,23,42,0.8); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #fff; box-sizing: border-box;" placeholder="••••••••" required>
+            </div>
+
+            <button type="submit" id="btn-admin-login" style="width: 100%; padding: 0.85rem; background: linear-gradient(135deg, #f43f5e 0%, #be123c 100%); border: none; border-radius: 8px; color: white; font-weight: 600; cursor: pointer; font-size: 0.9rem;">
+                Authenticate Counselor Session
+            </button>
+        </form>
+
+        <div style="margin-top: 1.25rem; padding: 0.85rem; background: rgba(0, 0, 0, 0.35); border: 1px dashed rgba(255, 255, 255, 0.15); border-radius: 8px; font-size: 0.75rem; color: #94a3b8;">
+            <div style="font-weight: 700; color: #cbd5e1; margin-bottom: 0.4rem; display: flex; justify-content: space-between; align-items: center;">
+                <span>📋 Default Demo Staff Credentials:</span>
+                <span style="font-size: 0.68rem; color: #10b981;">(Click row to auto-fill)</span>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.35rem; font-family: 'JetBrains Mono', monospace;">
+                <div style="cursor: pointer; padding: 0.25rem 0.4rem; background: rgba(255,255,255,0.03); border-radius: 4px;" onclick="autofillStaff('counselor', 'COUNSELOR01', 'Counselor@123')">
+                    🩺 <strong>Counselor:</strong> <span style="color: #38bdf8;">COUNSELOR01</span> / <span style="color: #cbd5e1;">Counselor@123</span>
+                </div>
+                <div style="cursor: pointer; padding: 0.25rem 0.4rem; background: rgba(255,255,255,0.03); border-radius: 4px;" onclick="autofillStaff('hod', 'HOD_CS', 'HodPassword@123')">
+                    🏛️ <strong>Faculty HOD:</strong> <span style="color: #38bdf8;">HOD_CS</span> / <span style="color: #cbd5e1;">HodPassword@123</span>
+                </div>
+                <div style="cursor: pointer; padding: 0.25rem 0.4rem; background: rgba(255,255,255,0.03); border-radius: 4px;" onclick="autofillStaff('admin', 'ADMIN01', 'AdminPass@123')">
+                    🛡️ <strong>Chief Admin:</strong> <span style="color: #38bdf8;">ADMIN01</span> / <span style="color: #cbd5e1;">AdminPass@123</span>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 1.5rem; font-size: 0.78rem; color: #64748b;">
+            <span>Student in distress? </span>
+            <a href="/" style="color: #38bdf8; text-decoration: none;">Return to Student Reflection Portal &rarr;</a>
+        </div>
+    </div>
+
+    <!-- 2. COUNSELOR DASHBOARD VIEW (Displayed when authenticated) -->
+    <main id="admin-dashboard-view" class="admin-main" style="display: none;">
+        <!-- Metrics Grid -->
+        <div class="admin-stats-grid">
+            <div class="stat-card alert">
+                <span class="stat-label">Active High Crisis Referrals</span>
+                <span class="stat-val" id="stat-high-count">0</span>
+                <span class="stat-sub">Immediate counselor handoff required</span>
+            </div>
+            <div class="stat-card active-users">
+                <span class="stat-label">Total Student Reflections</span>
+                <span class="stat-val" id="stat-total-reflections">0</span>
+                <span class="stat-sub">AES-256-GCM zero-plaintext vault</span>
+            </div>
+            <div class="stat-card telemetry">
+                <span class="stat-label">Acoustic Vocal Tremors Flagged</span>
+                <span class="stat-val" id="stat-tremor-count">0</span>
+                <span class="stat-sub">DAIC-WOZ autonomic micro-tremor telemetry</span>
+            </div>
+        </div>
+
+        <!-- Crisis Escalation Queue Section -->
+        <section class="triage-section">
+            <div class="triage-section-header">
+                <div class="triage-title-group">
+                    <h2>
+                        <span>🚨 Priority Clinical Crisis Handoff Queue</span>
+                    </h2>
+                    <p>Verified on-device screening with HMAC SHA-256 sealed referral tokens</p>
+                </div>
+
+                <button class="btn-decrypt-case" onclick="fetchCounselorTriageQueue()" style="padding: 0.45rem 0.85rem; background: rgba(56, 189, 248, 0.12); border-color: rgba(56, 189, 248, 0.4); color: #38bdf8;">
+                    🔄 Refresh Queue
+                </button>
+            </div>
+
+            <div class="table-responsive">
+                <table class="triage-table">
+                    <thead>
+                        <tr>
+                            <th>Case / Referral ID</th>
+                            <th>Student ID / User</th>
+                            <th>Timestamp</th>
+                            <th>Primary Stress Domain</th>
+                            <th>Acoustic Telemetry</th>
+                            <th>Clinical Status</th>
+                            <th>Consultation Decryption</th>
+                        </tr>
+                    </thead>
+                    <tbody id="triage-queue-body">
+                        <tr>
+                            <td colspan="7" style="text-align: center; color: #64748b; padding: 2rem;">Loading priority crisis cases...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- DUAL-KEY CONSULTATION DECRYPTION MODAL -->
+    <div id="decryption-modal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>
+                    <span>🔒 Dual-Key Consultation Decryption</span>
+                </h3>
+                <button class="btn-close-modal" onclick="closeDecryptionModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="privacy-box">
+                    🛡️ <strong>Zero-Knowledge Medical Privacy Standard:</strong><br>
+                    Student reflections are encrypted with individual AES-256-GCM keys. The raw diary text cannot be decrypted without the student's consent. Please ask the student for their <strong>Confidential Vault Passphrase or Referral Passcode</strong> from their referral slip.
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                    <div style="font-size: 0.78rem; color: #94a3b8;">Case ID: <strong id="modal-case-id" style="color: #38bdf8; font-family: 'JetBrains Mono', monospace;">-</strong></div>
+                    <div style="font-size: 0.78rem; color: #94a3b8; margin-top: 0.25rem;">Student: <strong id="modal-student-name" style="color: #fff;">-</strong></div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label style="display: block; font-size: 0.8rem; font-weight: 600; color: #d1d5db; margin-bottom: 0.4rem;">Student Vault Passphrase / One-Time Passcode</label>
+                    <input type="password" id="student-passcode-input" class="form-input" style="width: 100%; padding: 0.75rem; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: #fff; box-sizing: border-box;" placeholder="Enter student's passcode from referral slip">
+                </div>
+
+                <button type="button" class="btn-decrypt-case" id="btn-execute-decrypt" onclick="executeConsultationDecryption()" style="width: 100%; justify-content: center; padding: 0.85rem; font-size: 0.9rem;">
+                    🔓 Decrypt Reflection for Clinical Evaluation
+                </button>
+
+                <div id="decrypted-result-box" class="decrypted-text-view"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentAdminUser = null;
+        let activeQueueCases = [];
+        let selectedCaseForDecryption = null;
+
+        function autofillStaff(role, identifier, password) {
+            document.getElementById("admin-role-select").value = role;
+            document.getElementById("admin-identifier").value = identifier;
+            document.getElementById("admin-password").value = password;
+        }
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            await checkAdminSession();
+        });
+
+        async function checkAdminSession() {
+            try {
+                const res = await fetch("/api/admin/me");
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.user && ["counselor", "hod", "admin"].includes(data.user.role)) {
+                        currentAdminUser = data.user;
+                        renderAdminDashboard();
+                        return;
+                    }
+                }
+            } catch (e) {}
+
+            // Show login form
+            document.getElementById("admin-login-view").style.display = "block";
+            document.getElementById("admin-dashboard-view").style.display = "none";
+            document.getElementById("admin-user-header").style.display = "none";
+        }
+
+        function renderAdminDashboard() {
+            document.getElementById("admin-login-view").style.display = "none";
+            document.getElementById("admin-dashboard-view").style.display = "block";
+            document.getElementById("admin-user-header").style.display = "flex";
+
+            document.getElementById("admin-user-name").textContent = currentAdminUser.full_name;
+            document.getElementById("admin-user-role").textContent = currentAdminUser.role.toUpperCase();
+
+            fetchCounselorTriageQueue();
+        }
+
+        async function handleAdminLoginSubmit(e) {
+            e.preventDefault();
+            const role = document.getElementById("admin-role-select").value;
+            const identifier = document.getElementById("admin-identifier").value.trim();
+            const password = document.getElementById("admin-password").value;
+            const errorAlert = document.getElementById("login-error-alert");
+            const btn = document.getElementById("btn-admin-login");
+
+            errorAlert.style.display = "none";
+            btn.disabled = true;
+            btn.textContent = "Authenticating...";
+
+            try {
+                const res = await fetch("/api/auth/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        identifier: identifier,
+                        password: password,
+                        role_hint: role
+                    })
+                });
+
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.detail || "Authentication failed.");
+
+                currentAdminUser = data.user;
+                renderAdminDashboard();
+            } catch (err) {
+                errorAlert.textContent = err.message;
+                errorAlert.style.display = "block";
+                btn.disabled = false;
+                btn.textContent = "Authenticate Counselor Session";
+            }
+        }
+
+        async function handleAdminLogout() {
+            await fetch("/api/auth/logout", { method: "POST" });
+            window.location.reload();
+        }
+
+        async function fetchCounselorTriageQueue() {
+            const tbody = document.getElementById("triage-queue-body");
+            try {
+                const res = await fetch("/api/admin/triage/queue");
+                if (!res.ok) throw new Error("Failed fetching queue.");
+
+                const data = await res.json();
+                activeQueueCases = data.cases || [];
+
+                document.getElementById("stat-high-count").textContent = activeQueueCases.length;
+                document.getElementById("stat-total-reflections").textContent = data.total_reflections || 0;
+                document.getElementById("stat-tremor-count").textContent = data.vocal_tremor_count || 0;
+
+                if (activeQueueCases.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #10b981; padding: 2rem;">✅ Zero Active High-Tier Crisis Escalations at this moment.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = activeQueueCases.map(c => {
+                    const dateStr = new Date(c.created_at).toLocaleString();
+                    const tremor = c.vocal_stress_index || 0;
+                    return `
+                        <tr>
+                            <td><span class="case-pill">${escapeHtml(c.case_id)}</span></td>
+                            <td><strong>${escapeHtml(c.student_name || c.student_id || 'Student')}</strong></td>
+                            <td style="color: #94a3b8; font-size: 0.78rem;">${dateStr}</td>
+                            <td><span style="color: #cbd5e1;">${escapeHtml(c.primary_domain || 'Placement Pressure')}</span></td>
+                            <td>
+                                <div class="tremor-meter">
+                                    <div class="tremor-bar-track"><div class="tremor-bar-fill" style="width: ${Math.min(tremor, 100)}%;"></div></div>
+                                    <span style="color: ${tremor > 70 ? '#f43f5e' : '#fbbf24'}">${tremor.toFixed(0)}/100</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="tier-badge-high">🔴 HIGH CRISIS</span>
+                            </td>
+                            <td>
+                                <button class="btn-decrypt-case" onclick="openDualKeyModal('${c.case_id}')">
+                                    🔓 Decrypt for Triage
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                }).join("");
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #f43f5e; padding: 2rem;">Error: ${escapeHtml(err.message)}</td></tr>`;
+            }
+        }
+
+        function openDualKeyModal(caseId) {
+            const item = activeQueueCases.find(c => c.case_id === caseId);
+            if (!item) return;
+
+            selectedCaseForDecryption = item;
+            document.getElementById("modal-case-id").textContent = item.case_id;
+            document.getElementById("modal-student-name").textContent = item.student_name || item.student_id || "Student";
+            document.getElementById("student-passcode-input").value = "";
+            document.getElementById("decrypted-result-box").style.display = "none";
+            document.getElementById("decrypted-result-box").textContent = "";
+            document.getElementById("decryption-modal").style.display = "flex";
+        }
+
+        function closeDecryptionModal() {
+            document.getElementById("decryption-modal").style.display = "none";
+            selectedCaseForDecryption = null;
+        }
+
+        async function executeConsultationDecryption() {
+            if (!selectedCaseForDecryption) return;
+            const pass = document.getElementById("student-passcode-input").value;
+            const resultBox = document.getElementById("decrypted-result-box");
+            const btn = document.getElementById("btn-execute-decrypt");
+
+            if (!pass) {
+                alert("Please enter the student's passcode from the referral pass.");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = "Decrypting via PBKDF2HMAC...";
+
+            try {
+                const res = await fetch("/api/admin/triage/decrypt", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        case_id: selectedCaseForDecryption.case_id,
+                        student_passphrase: pass
+                    })
+                });
+
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.detail || "Decryption failed.");
+
+                resultBox.style.display = "block";
+                resultBox.textContent = `📋 DECRYPTED STUDENT REFLECTION:\n\n"${data.decrypted_text}"\n\n📌 DETECTED STRESSORS: ${data.stressors.join(", ")}\n🩺 CLINICAL BIOMARKERS: ${(data.clinical_markers || []).join(", ")}`;
+                btn.textContent = "✅ Decrypted in Ephemeral Memory";
+            } catch (err) {
+                alert("Consultation Decryption Error: " + err.message);
+                btn.disabled = false;
+                btn.textContent = "🔓 Decrypt Reflection for Clinical Evaluation";
+            }
+        }
+
+        function escapeHtml(str) {
+            if (!str) return "";
+            return String(str)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
+
